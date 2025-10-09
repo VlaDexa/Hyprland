@@ -47,7 +47,7 @@ jobs:
 
       - uses: cachix/cachix-action@v15
         with:
-          name: hyprland
+          name: vladexa
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
       - run: ${{ inputs.command }}
