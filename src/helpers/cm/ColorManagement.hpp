@@ -338,6 +338,9 @@ namespace NColorManagement {
                 default: return sdrRefLuminance >= 0 ? sdrRefLuminance : SDR_REF_LUMINANCE;
             }
         };
+
+        // Brightest luminance the content is expected to reach, as opposed to the range of its encoding.
+        float getContentMaxLuminance() const;
     };
 
     class CImageDescription {

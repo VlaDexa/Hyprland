@@ -79,6 +79,17 @@ const Hyprgraphics::CMatrix3& CPrimaries::convertMatrix(const WP<const CPrimarie
     return primariesConversion[cacheKey];
 }
 
+float SImageDescription::getContentMaxLuminance() const {
+    if (maxCLL > 0)
+        return maxCLL;
+
+    // The target color volume defaults to the primary color volume when no mastering luminances are set.
+    if (masteringLuminances.max > 0)
+        return masteringLuminances.max;
+
+    return luminances.max > 0 ? luminances.max : luminances.reference;
+}
+
 CImageDescription::CImageDescription(const SImageDescription& imageDescription, const uint64_t imageDescriptionId) :
     m_id(imageDescriptionId), m_imageDescription(imageDescription) {
     m_primariesId = CPrimaries::from(m_imageDescription.getPrimaries())->id();

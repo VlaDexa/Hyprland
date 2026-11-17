@@ -120,3 +120,31 @@ TEST(ColorManagement, NativeLinearConversionPreservesExtendedRange) {
     EXPECT_NEAR(color.c.b, 12500.0, 0.0001);
     EXPECT_DOUBLE_EQ(color.c.a, 1.0);
 }
+
+TEST(ColorManagement, ContentMaxLuminancePrefersContentMetadata) {
+    SImageDescription description = {
+        .transferFunction = CM_TRANSFER_FUNCTION_ST2084_PQ,
+        .primariesNameSet = true,
+        .primariesNamed   = CM_PRIMARIES_BT2020,
+        .luminances       = {.min = 0.0f, .max = 10000, .reference = 203},
+    };
+    // Without content metadata the target color volume is the primary color volume.
+    EXPECT_FLOAT_EQ(description.getContentMaxLuminance(), 10000.F);
+
+    description.masteringLuminances = {.min = 0.005f, .max = 1000};
+    EXPECT_FLOAT_EQ(description.getContentMaxLuminance(), 1000.F);
+
+    description.maxCLL = 600;
+    EXPECT_FLOAT_EQ(description.getContentMaxLuminance(), 600.F);
+
+    description.masteringLuminances = {};
+    EXPECT_FLOAT_EQ(description.getContentMaxLuminance(), 600.F);
+}
+
+TEST(ColorManagement, ContentMaxLuminanceFallsBackToReference) {
+    const SImageDescription description = {
+        .transferFunction = CM_TRANSFER_FUNCTION_EXT_LINEAR,
+        .luminances       = {.min = 0.0f, .max = 0, .reference = 203},
+    };
+    EXPECT_FLOAT_EQ(description.getContentMaxLuminance(), 203.F);
+}
